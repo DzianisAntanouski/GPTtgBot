@@ -1,4 +1,4 @@
-import { Telegraf, session } from "telegraf";
+import { Telegraf, session, Markup } from "telegraf";
 import { message } from "telegraf/filters";
 import { code } from "telegraf/format";
 import config from "config";
@@ -19,12 +19,12 @@ bot.use(session());
 
 bot.command("help", async (ctx) => {
     await ctx.reply("/new - reset context");
-    await ctx.reply("'image: {text}' - generate img");
+    await ctx.reply("image: {text} - Template for requesting an image based on its description.");
 });
 
 bot.command("new", async (ctx) => {
     ctx.session = INIT_SESSION;
-    await ctx.reply("Still waiting your new messages ...");
+    await ctx.reply("Session reset done.");
 });
 
 bot.command("lever", async (ctx) => {
@@ -34,7 +34,11 @@ bot.command("lever", async (ctx) => {
 
 bot.command("start", async (ctx) => {
     ctx.session = INIT_SESSION;
-    await ctx.reply("/help");
+    ctx.reply('Hello! Please obtain authorization from the administration to be able to ask questions using voice or text and generate images based on descriptions.', Markup.keyboard([
+      ['/new', '/help'],
+    ])
+    .resize()
+  );
 });
 
 bot.on(message("voice"), async (ctx) => {
