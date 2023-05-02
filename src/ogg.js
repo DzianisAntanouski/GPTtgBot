@@ -13,7 +13,7 @@ class OggConverter {
         Ffmpeg.setFfmpegPath(installer.path);
     }
 
-    toMp3(oggPath, filename) {
+    async toMp3(oggPath, filename) {
         try {
             const outPath = resolve(dirname(oggPath), `${filename}.mp3`);
             return new Promise((resolve, reject) => {

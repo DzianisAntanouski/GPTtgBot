@@ -17,6 +17,11 @@ const bot = new Telegraf(config.get("TG_TOKEN"));
 
 bot.use(session());
 
+bot.command("help", async (ctx) => {
+    await ctx.reply("/new - reset context");
+    await ctx.reply("'image: {text}' - generate img");
+});
+
 bot.command("new", async (ctx) => {
     ctx.session = INIT_SESSION;
     await ctx.reply("Still waiting your new messages ...");
@@ -29,7 +34,7 @@ bot.command("lever", async (ctx) => {
 
 bot.command("start", async (ctx) => {
     ctx.session = INIT_SESSION;
-    await ctx.reply("Still waiting your new messages ...");
+    await ctx.reply("/help");
 });
 
 bot.on(message("voice"), async (ctx) => {
@@ -63,6 +68,7 @@ bot.on(message("voice"), async (ctx) => {
             content: gptMessage.content,
         });
         await ctx.reply(gptMessage.content);
+        console.log("id: ", ctx.message.from.id, "user: ", ctx.message.from.first_name, " ", ctx.message.from.last_name)
     } catch (error) {
         console.error("Err", error.message);
     }
@@ -77,11 +83,19 @@ bot.on(message("text"), async (ctx) => {
     try {
         await ctx.reply(code("Message apply, please wait ..."));
 
+        if(ctx.message.text.startsWith('image: ')) {
+            const imageResponse = await openai.getJpg(ctx.message.text.replace('image: ', ''))
+            ctx.replyWithPhoto({
+                source: imageResponse.data,
+              });
+            return
+        }
+
         ctx.session.messages.push({
             role: openai.roles.USER,
             content: ctx.message.text,
         });
-
+        
         const gptMessage = await openai.chat(ctx.session.messages);
 
         ctx.session.messages.push({
@@ -89,7 +103,7 @@ bot.on(message("text"), async (ctx) => {
             content: gptMessage.content,
         });
         await ctx.reply(gptMessage.content);
-
+        console.log("id: ", ctx.message.from.id, "user: ", ctx.message.from.first_name, " ", ctx.message.from.last_name)
     } catch (error) {
         console.error("Err", error.message);
     }
