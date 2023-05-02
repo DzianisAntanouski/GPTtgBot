@@ -1,0 +1,7 @@
+applications:
+  - name: gpt-tg-bot
+    path: .
+    health-check-type: process
+    no-route: true
+    services:
+      - gpt-tg-bot
